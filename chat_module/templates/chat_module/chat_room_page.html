@@ -1,0 +1,115 @@
+{% extends 'shared/chat_room/_layout.html' %}
+
+{% block title %}
+    {{ object.name }}
+{% endblock %}
+
+{% block content %}
+    <section class="msger">
+        <header class="msger-header">
+            <div class="msger-header-title">
+                <i class="fas fa-comment-alt"></i> {{ object.name }}
+            </div>
+            <div class="msger-header-options">
+                <span><i class="fas fa-cog"></i></span>
+            </div>
+        </header>
+
+        <main id="chat-messages" class="msger-chat">
+            <div id="chat_area">
+                {% for item in message %}
+                    {% if item.user.username == user.username %}
+                        <div class="msg right-msg">
+                    {% else %}
+                        <div class="msg left-msg">
+                    {% endif %}
+                    <div class="msg-img" style="background-image: url(/static/img/user.png)"></div>
+                <div class="msg-bubble">
+                    <div class="msg-info">
+                        <div class="msg-info-name">{{ item.user.username }}</div>
+                        <div class="msg-info-time">{{ item.date_added }}</div>
+                    </div>
+                    <div class="msg-text">
+                        {{ item.content }}
+                    </div>
+                </div>
+                </div>
+                {% endfor %}
+            </div>
+        </main>
+
+        <div class="msger-inputarea">
+            <input type="text" class="msger-input" placeholder="Write your message..." id="chat-message-input">
+            <a onclick="sendMessage()" class="send-btn" id="chat-message-submit"><i class="fa fa-send icon-size"></i></a>
+        </div>
+    </section>
+{% endblock %}
+
+{% block scripts %}
+    {{ object.slug|json_script:"json-roomname" }}
+    {{ object.id|json_script:"json-roomid" }}
+    {{ request.user.username|json_script:"json-username" }}
+
+    <script>
+        const roomName = JSON.parse(document.getElementById('json-roomname').textContent);
+        const roomId = JSON.parse(document.getElementById('json-roomid').textContent);
+        const userName = JSON.parse(document.getElementById('json-username').textContent);
+        const socket = new WebSocket(
+            'ws://'
+            + window.location.host
+            + '/ws/'
+            + 'chat/'
+            + roomName
+            + '/'
+        );
+
+        socket.onclose = function (e) {
+            console.log('onclose')
+        };
+
+        socket.onmessage = function (e) {
+            $.get('/chat/add-message', {
+                mass: roomId,
+            }).then(res => {
+                $('#chat_area').html(res);
+                scrollToBottom();
+            })
+        };
+
+        document.querySelector('#chat-message-input').focus();
+        document.querySelector('#chat-message-input').onkeyup = function (e) {
+            if (e.keyCode === 13) {
+                document.querySelector('#chat-message-submit').click();
+            }
+        };
+
+        function sendMessage() {
+            if ($("#chat-message-input").val().length == 0) {
+                // do something
+            } else {
+                var message = $('#chat-message-input').val();
+            }
+
+
+            $.get('/chat/add-message', {
+                mass: roomId,
+            }).then(res => {
+                socket.send(JSON.stringify({
+                    'message': message,
+                    'username': userName,
+                    'room': roomName
+                }));
+                $('#chat_area').html(res);
+                $('#chat-message-input').val('');
+            })}
+
+
+        function scrollToBottom() {
+            let objDiv = document.getElementById("chat-messages");
+            objDiv.scrollTop = objDiv.scrollHeight;
+        }
+
+        scrollToBottom();
+
+    </script>
+{% endblock %}

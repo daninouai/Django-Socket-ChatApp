@@ -1,0 +1,22 @@
+<div id="chat_area">
+    <div id="chat-messages">
+        {% for item in message %}
+            {% if item.user.username == user.username %}
+                <div class="msg right-msg">
+            {% else %}
+                <div class="msg left-msg">
+            {% endif %}
+            <div class="msg-img" style="background-image: url(/static/img/user.png)"></div>
+        <div class="msg-bubble">
+            <div class="msg-info">
+                <div class="msg-info-name">{{ item.user.username }}</div>
+                <div class="msg-info-time">{{ item.date_added }}</div>
+            </div>
+            <div class="msg-text">
+                {{ item.content }}
+            </div>
+        </div>
+        </div>
+        {% endfor %}
+        </div>
+    </div>

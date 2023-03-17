@@ -1,0 +1,53 @@
+{% extends 'shared/chat_room/_layout.html' %}
+
+{% block title %}
+    ChatRoom
+{% endblock %}
+
+{% block content %}
+    <section class="msger">
+        <header class="msger-header">
+            <div class="msger-header-title">
+                <i class="fas fa-comment-alt"></i> select your chat room
+            </div>
+            {% if request.user.is_authenticated %}
+                <div class="msger-header-title">
+                    <a href="{% url 'logout_page' %}">
+                        <i class="fa fa-arrow-right-arrow-left"></i> Logout
+                    </a>
+                </div>
+            {% else %}
+                <div class="msger-header-title">
+                    <a href="{% url 'register_page' %}">
+                        <i class="fa fa-user-plus"></i> Register
+                    </a>
+                </div>
+                <div class="msger-header-title">
+                    <a href="{% url 'login_page' %}">
+                        <i class="fa fa-right-to-bracket"></i> Login
+                    </a>
+                </div>
+            {% endif %}
+            <div class="msger-header-options">
+                <span><i class="fas fa-cog"></i></span>
+            </div>
+        </header>
+
+        <main id="chat-messages" class="msger-main">
+            {% for room in rooms %}
+                <a href="{% url 'enter_room' room.slug %}">
+                    <div id="chat_area">
+                        <div class="">
+                            <div class="room-bubble">
+                                <div class="room-info">
+                                    <div class="room-info-name">{{ room.name }}</div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </a>
+            {% endfor %}
+
+        </main>
+    </section>
+{% endblock %}
