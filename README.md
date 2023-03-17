@@ -1,2 +1,3 @@
 # Django-Socket-ChatApp
-the very simple chat app with django
+A very simple chat room program using Django Socket
+This repository will be expanded in the future
